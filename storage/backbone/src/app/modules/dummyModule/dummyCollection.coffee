@@ -9,12 +9,20 @@ define (require)->
   class DummyCollection extends Backbone.Collection
     model: Dummy
     sync: DropBoxStorage.sync
-    path: ""
       
-    constructor:(models,options)->
+    constructor:(models, options)->
       super models,options
-      @path = options.path
-      @on('reset',()->console.log "reset collection")
-      @on('fetch',()->console.log "fetching collection");
-
+      @path = options.path or ""
+      @on('update', @onUpdate)
+      @on('reset',  @onReset)
+      @on('fetch',  ()->console.log "fetching collection")
+    
+    onReset:()->
+      console.log "reset collection"
+      console.log @
+      
+    onUpdate:()->
+      console.log "updated collection"
+      console.log @
+      
   return DummyCollection

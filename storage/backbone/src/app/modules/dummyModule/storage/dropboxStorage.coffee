@@ -4,9 +4,9 @@ define (require)->
   Backbone = require 'backbone'
   LocalStorage = require 'localstorage'
   Dropbox = require "dropbox"
+
   
   class DropBoxStorage
-    
     constructor:->
       @client = new Dropbox.Client
         key: "h8OY5h+ah3A=|AS0FmmbZJrmc8/QbpU6lMzrCd5lSGZPCKVtjMlA7ZA=="
@@ -54,23 +54,17 @@ define (require)->
           # Tell the user an error occurred, ask them to refresh the page.
       
     sync:(method, model, options)=>
-      console.log "dropbox storage"
-      console.log "method "+method
-      console.log "model"
-      console.log model
-      console.log "options"
-      console.log options
-      
-      
-      
       switch method
         when 'read' 
           console.log "reading"
-          @findAll(model, options)
+          if model.id?
+            console.log "bla",model.id
+            return @find(model, options)
+          else
+            return @findAll(model, options)
           
         when 'create'
           console.log "creating"
-          
           unless model.id
             model.set model.id, model.idAttribute
             #model.id = guid()
@@ -104,69 +98,57 @@ define (require)->
           @remove(id)
           
     
-    find: (model) ->
-      return JSON.parse(this.localStorage().getItem(this.name+"-"+model.id))
+    find: (model, options) ->
+       path = model.rootPath or model.path or "/"
+       promise  =  @_findByName(path, model.id)
+       
+       parse=(res)=>
+         console.log "res"
+         console.log res[0]
+         filePath = res[0].path
+         @_readFile(filePath).then (res)->
+           console.log "gne"
+           console.log res
+           #return JSON.parse(res)
+           model.set(JSON.parse(res))
+           console.log model
+       
+       $.when(promise).then(parse)
+       
+      #return JSON.parse(this.localStorage().getItem(this.name+"-"+model.id))
     
     findAll:(model, options)->
+      console.log "searching at #{model.path}"
+      rootPath = model.path
       success = options.success
       error = options.error
       
       promises = []
-      promise  = @readDir("/")
+      promise  = @_readDir(model.path)
       model.trigger('fetch', model, null, options)
-      results = []
       
-      fetchData=(fileName)=>
-        console.log "got #{fileName}"
-        p = @readFile2(fileName)
-        p.then (data)=>
-          promises.push 
-          console.log "Data: #{data}"
-          results.push data
-      
-      truc=(entries)=>
-        console.log "args",arguments
+      fetchData=(entries)=>
         for fileName in entries
-          console.log "filename: #{fileName}"
-          promises.push @readFile2(fileName)
-        
-          
-      #promise.then(truc)
-      $.when(promise).then(truc).pipe.apply($, promises).done ()=>
-        console.log "args",arguments[0]
-        console.log("ALL DONE", results)
-        model.trigger('reset',results)
+          filePath = "#{rootPath}/#{fileName}"
+          console.log "file path: #{filePath}"
+          promises.push @_readFile(filePath)
+        $.when.apply($, promises).done ()=>
+          results = arguments
+          results = $.map(results, JSON.parse)
+          console.log("ALL DONE", results)
+          if options.update?
+            if options.update == true
+              model.update(results)
+              model.trigger("update",results)
+            else
+              model.reset(results, collection:model)
+          else
+            model.reset(results, collection:model)
+          if success?
+            success(results)
+          return results
+      $.when(promise).then(fetchData)    
       
-      ###  
-      $.when.apply($, promises).done ()=>
-        arguments[0]
-        console.log("ALL DONE", results)
-        model.trigger('reset',results)
-      ###
-        
-      ###
-      
-        for fileName in entries
-          
-        model.trigger('reset')
-        #options.success(res)
-      ###
-      #promise1.then(getStuff).then(myServerScript2Data)
-      ###
-      callback = (entries)=>
-        console.log entries
-        console.log "Entries nb"+entries.length
-        for fileName in entries
-          console.log fileName
-          readFileContent= (fileContent)=>
-            console.log "fileContent"
-            console.log fileContent
-            @resultOfFindAll.push(JSON.parse(fileContent))
-          @readFile(readFileContent,fileName)
-          
-      
-      ###
-      #return @resultOfFindAll
       
     remove:(name)->
       @client.remove name, (error, userInfo)->
@@ -186,31 +168,33 @@ define (require)->
           return @showError(error)  
         console.log "folder create ok"
         
-    readDir:(path)->
+    _readDir:(path)->
       d = $.Deferred()
       @client.readdir path, (error, entries)=>
         if error
           return @showError(error)
         d.resolve entries
       return d.promise()
-        #callback(entries)
         
-    readDir2:(path)->
-      return @client.readdir "/"
-        
-    readFile:(callback, path)->
-      @client.readFile path, (error, data)=>
-        if error
-          return @showError(error)
-        callback(data)
-        
-    readFile2:(path)->
+    _readFile:(path)->
       d = $.Deferred()
       @client.readFile path, (error, data)=>
         if error
           return @showError(error)
         d.resolve data
       return d.promise()
+    
+    _findByName:(path,name)->
+      console.log path,name
+      d = $.Deferred()
+      @client.findByName path,name, (error, data)=>
+        if error
+          return @showError(error)
+        console.log "found data #{data}"
+        d.resolve(data)
+      return d.promise()
+        
+        
       
   store = new DropBoxStorage
   return store 

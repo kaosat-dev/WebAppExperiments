@@ -26,6 +26,10 @@
       };
 
       function DummySubApp(options) {
+        this.findDummy = __bind(this.findDummy, this);
+
+        this.fetchDummies = __bind(this.fetchDummies, this);
+
         this.saveDummies = __bind(this.saveDummies, this);
 
         this.listDummies = __bind(this.listDummies, this);
@@ -59,9 +63,7 @@
         });
       };
 
-      DummySubApp.prototype.onStart = function() {
-        return this.dummies.fetch();
-      };
+      DummySubApp.prototype.onStart = function() {};
 
       DummySubApp.prototype.newDummy = function() {
         console.log("so you want a new dummy eh ?");
@@ -88,6 +90,22 @@
 
       DummySubApp.prototype.saveDummies = function() {
         return this.dummy.save();
+      };
+
+      DummySubApp.prototype.fetchDummies = function() {
+        return this.dummies.fetch();
+      };
+
+      DummySubApp.prototype.findDummy = function(name) {
+        var dummy, toto;
+        console.log("trying to find dummy called: " + name);
+        dummy = new Dummy(null, {
+          options: {
+            pathRoot: "/project1"
+          }
+        });
+        dummy.id = "0.4431052121799439";
+        return toto = dummy.fetch();
       };
 
       return DummySubApp;

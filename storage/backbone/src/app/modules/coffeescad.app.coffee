@@ -18,8 +18,15 @@ define (require)->
       "click .deleteDummy": ()->vent.trigger("dummy:delete")
       "click .listDummies": ()->vent.trigger("dummy:list")
       "click .saveDummies": ()->vent.trigger("dummies:save")
+      "click .fetchDummies": ()->vent.trigger("dummies:fetch")
+      
       "click .dropBoxLogin": ()->vent.trigger("dropbox:login")
+      "click .dropBoxLogout": ()->vent.trigger("dropbox:logout")
+      
       "click .folderCreate": ()->vent.trigger("folder:create")
+      
+      "click .findDummy" : ()->vent.trigger("dummy:find",$("#dummyFindInput").val())
+      
       
     constructor:(options)->
       super options
@@ -47,14 +54,7 @@ define (require)->
       
       @initLayout()
       @initStorage()
-      ###
-      @vent.bind("downloadStlRequest", stlexport)
-      @vent.bind("fileSaveRequest", saveProject)
-      @vent.bind("fileLoadRequest", loadProject)
-      @vent.bind("fileDeleteRequest", deleteProject)
-      @vent.bind("editorShowRequest", showEditor)
-      ###
-      
+     
     initLayout:=>
       @layout = new MainLayout()
       @headerRegion.show @layout
@@ -76,7 +76,7 @@ define (require)->
         regions: 
           mainRegion: "#content"#@layout.regions
       dummySubApp.start()
-      
+      vent.trigger("dummy:list")
       
     onAppStarted:(appName)->
       console.log "I see app: #{appName} has started"

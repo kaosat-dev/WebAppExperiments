@@ -20,7 +20,9 @@
         "dummy:new": 'newDummy',
         "dummy:delete": 'deleteDummy',
         "dummy:save": 'saveDummy',
-        "dummies:save": 'saveDummies'
+        "dummy:find": 'findDummy',
+        "dummies:save": 'saveDummies',
+        "dummies:fetch": 'fetchDummies'
       };
 
       function DummyRouter(options) {

@@ -19,18 +19,25 @@
 
       DummyCollection.prototype.sync = DropBoxStorage.sync;
 
-      DummyCollection.prototype.path = "";
-
       function DummyCollection(models, options) {
         DummyCollection.__super__.constructor.call(this, models, options);
-        this.path = options.path;
-        this.on('reset', function() {
-          return console.log("reset collection");
-        });
+        this.path = options.path || "";
+        this.on('update', this.onUpdate);
+        this.on('reset', this.onReset);
         this.on('fetch', function() {
           return console.log("fetching collection");
         });
       }
+
+      DummyCollection.prototype.onReset = function() {
+        console.log("reset collection");
+        return console.log(this);
+      };
+
+      DummyCollection.prototype.onUpdate = function() {
+        console.log("updated collection");
+        return console.log(this);
+      };
 
       return DummyCollection;
 

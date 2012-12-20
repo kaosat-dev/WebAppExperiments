@@ -3,17 +3,17 @@ define (require)->
   _ = require 'underscore'
   Backbone = require 'backbone'
   marionette = require 'marionette'
-  #dummyController = require './dummyController'
   vent = require '../coffeescad.vent'
   
   class DummyRouter extends Backbone.Marionette.AppRouter
-    #controller: dummyController
     appRoutes: 
         "dummy:list"  : 'listDummies'
         "dummy:new"   : 'newDummy'
         "dummy:delete": 'deleteDummy'
         "dummy:save"  : 'saveDummy'
+        "dummy:find"  : 'findDummy'
         "dummies:save": 'saveDummies'
+        "dummies:fetch":'fetchDummies'
         
     constructor:(options)->
       super options

@@ -14,6 +14,9 @@
 
       __extends(Dummy, _super);
 
+      "PathRoot is used similarly to Backbones urlRoot";
+
+
       Dummy.prototype.defaults = {
         name: "mainPart",
         ext: "coscad",
@@ -24,14 +27,13 @@
 
       Dummy.prototype.sync = DropBoxStorage.sync;
 
-      function Dummy(options) {
-        Dummy.__super__.constructor.call(this, options);
-        this.on("request", this.toto);
-      }
+      Dummy.prototype.pathRoot = "";
 
-      Dummy.prototype.toto = function() {
-        return console.log("toto");
-      };
+      function Dummy(attributes, options) {
+        Dummy.__super__.constructor.call(this, attributes, options);
+        console.log(attributes);
+        this.pathRoot = options.pathRoot;
+      }
 
       return Dummy;
 

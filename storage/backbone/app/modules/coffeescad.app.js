@@ -36,11 +36,20 @@
         "click .saveDummies": function() {
           return vent.trigger("dummies:save");
         },
+        "click .fetchDummies": function() {
+          return vent.trigger("dummies:fetch");
+        },
         "click .dropBoxLogin": function() {
           return vent.trigger("dropbox:login");
         },
+        "click .dropBoxLogout": function() {
+          return vent.trigger("dropbox:logout");
+        },
         "click .folderCreate": function() {
           return vent.trigger("folder:create");
+        },
+        "click .findDummy": function() {
+          return vent.trigger("dummy:find", $("#dummyFindInput").val());
         }
       };
 
@@ -83,14 +92,6 @@
         this.vent.on("folder:create", this.createFolder);
         this.initLayout();
         this.initStorage();
-        /*
-              @vent.bind("downloadStlRequest", stlexport)
-              @vent.bind("fileSaveRequest", saveProject)
-              @vent.bind("fileLoadRequest", loadProject)
-              @vent.bind("fileDeleteRequest", deleteProject)
-              @vent.bind("editorShowRequest", showEditor)
-        */
-
       }
 
       CoffeeScadApp.prototype.initLayout = function() {
@@ -116,7 +117,8 @@
             mainRegion: "#content"
           }
         });
-        return dummySubApp.start();
+        dummySubApp.start();
+        return vent.trigger("dummy:list");
       };
 
       CoffeeScadApp.prototype.onAppStarted = function(appName) {

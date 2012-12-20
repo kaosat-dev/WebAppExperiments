@@ -70,16 +70,16 @@
 
       DropBoxStorage.prototype.sync = function(method, model, options) {
         var id;
-        console.log("dropbox storage");
-        console.log("method " + method);
-        console.log("model");
-        console.log(model);
-        console.log("options");
-        console.log(options);
         switch (method) {
           case 'read':
             console.log("reading");
-            return this.findAll(model, options);
+            if (model.id != null) {
+              console.log("bla", model.id);
+              return this.find(model, options);
+            } else {
+              return this.findAll(model, options);
+            }
+            break;
           case 'create':
             console.log("creating");
             if (!model.id) {
@@ -118,73 +118,70 @@
         }
       };
 
-      DropBoxStorage.prototype.find = function(model) {
-        return JSON.parse(this.localStorage().getItem(this.name + "-" + model.id));
+      DropBoxStorage.prototype.find = function(model, options) {
+        var parse, path, promise,
+          _this = this;
+        path = model.rootPath || model.path || "/";
+        promise = this._findByName(path, model.id);
+        parse = function(res) {
+          var filePath;
+          console.log("res");
+          console.log(res[0]);
+          filePath = res[0].path;
+          return _this._readFile(filePath).then(function(res) {
+            console.log("gne");
+            console.log(res);
+            model.set(JSON.parse(res));
+            return console.log(model);
+          });
+        };
+        return $.when(promise).then(parse);
       };
 
       DropBoxStorage.prototype.findAll = function(model, options) {
-        var error, fetchData, promise, promises, results, success, truc,
+        var error, fetchData, promise, promises, rootPath, success,
           _this = this;
+        console.log("searching at " + model.path);
+        rootPath = model.path;
         success = options.success;
         error = options.error;
         promises = [];
-        promise = this.readDir("/");
+        promise = this._readDir(model.path);
         model.trigger('fetch', model, null, options);
-        results = [];
-        fetchData = function(fileName) {
-          var p;
-          console.log("got " + fileName);
-          p = _this.readFile2(fileName);
-          return p.then(function(data) {
-            promises.push;
-            console.log("Data: " + data);
-            return results.push(data);
-          });
-        };
-        truc = function(entries) {
-          var fileName, _i, _len, _results;
-          console.log("args", arguments);
-          _results = [];
+        fetchData = function(entries) {
+          var fileName, filePath, _i, _len;
           for (_i = 0, _len = entries.length; _i < _len; _i++) {
             fileName = entries[_i];
-            console.log("filename: " + fileName);
-            _results.push(promises.push(_this.readFile2(fileName)));
+            filePath = "" + rootPath + "/" + fileName;
+            console.log("file path: " + filePath);
+            promises.push(_this._readFile(filePath));
           }
-          return _results;
+          return $.when.apply($, promises).done(function() {
+            var results;
+            results = arguments;
+            results = $.map(results, JSON.parse);
+            console.log("ALL DONE", results);
+            if (options.update != null) {
+              if (options.update === true) {
+                model.update(results);
+                model.trigger("update", results);
+              } else {
+                model.reset(results, {
+                  collection: model
+                });
+              }
+            } else {
+              model.reset(results, {
+                collection: model
+              });
+            }
+            if (success != null) {
+              success(results);
+            }
+            return results;
+          });
         };
-        return $.when(promise).then(truc).pipe.apply($, promises).done(function() {
-          console.log("args", arguments[0]);
-          console.log("ALL DONE", results);
-          return model.trigger('reset', results);
-        });
-        /*  
-        $.when.apply($, promises).done ()=>
-          arguments[0]
-          console.log("ALL DONE", results)
-          model.trigger('reset',results)
-        */
-
-        /*
-              
-                for fileName in entries
-                  
-                model.trigger('reset')
-                #options.success(res)
-        */
-
-        /*
-              callback = (entries)=>
-                console.log entries
-                console.log "Entries nb"+entries.length
-                for fileName in entries
-                  console.log fileName
-                  readFileContent= (fileContent)=>
-                    console.log "fileContent"
-                    console.log fileContent
-                    @resultOfFindAll.push(JSON.parse(fileContent))
-                  @readFile(readFileContent,fileName)
-        */
-
+        return $.when(promise).then(fetchData);
       };
 
       DropBoxStorage.prototype.remove = function(name) {
@@ -216,7 +213,7 @@
         });
       };
 
-      DropBoxStorage.prototype.readDir = function(path) {
+      DropBoxStorage.prototype._readDir = function(path) {
         var d,
           _this = this;
         d = $.Deferred();
@@ -229,21 +226,7 @@
         return d.promise();
       };
 
-      DropBoxStorage.prototype.readDir2 = function(path) {
-        return this.client.readdir("/");
-      };
-
-      DropBoxStorage.prototype.readFile = function(callback, path) {
-        var _this = this;
-        return this.client.readFile(path, function(error, data) {
-          if (error) {
-            return _this.showError(error);
-          }
-          return callback(data);
-        });
-      };
-
-      DropBoxStorage.prototype.readFile2 = function(path) {
+      DropBoxStorage.prototype._readFile = function(path) {
         var d,
           _this = this;
         d = $.Deferred();
@@ -251,6 +234,21 @@
           if (error) {
             return _this.showError(error);
           }
+          return d.resolve(data);
+        });
+        return d.promise();
+      };
+
+      DropBoxStorage.prototype._findByName = function(path, name) {
+        var d,
+          _this = this;
+        console.log(path, name);
+        d = $.Deferred();
+        this.client.findByName(path, name, function(error, data) {
+          if (error) {
+            return _this.showError(error);
+          }
+          console.log("found data " + data);
           return d.resolve(data);
         });
         return d.promise();

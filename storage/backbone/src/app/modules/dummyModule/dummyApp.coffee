@@ -36,7 +36,7 @@ define (require)->
         @vent.trigger "app:started", "#{@title}"
         
     onStart:()=>
-      @dummies.fetch()
+      #@dummies.fetch()
         
     newDummy:=>
       console.log "so you want a new dummy eh ?"
@@ -53,9 +53,22 @@ define (require)->
       @dummyView = new DummyCollectionView
         collection : @dummies
       @mainRegion.show(@dummyView)
+      
     saveDummies:=>
       @dummy.save()
       
- 
-  #dummySubApp = new DummySubApp()
+    fetchDummies:=>
+      @dummies.fetch()#update:true)
+      
+    findDummy:(name)=>
+      console.log "trying to find dummy called: #{name}"
+      #result = @dummies.get(name)
+      #console.log "result", result
+      
+      dummy = new Dummy null,
+        options:
+          pathRoot:"/project1"
+      dummy.id =  "0.4431052121799439"#name
+      toto = dummy.fetch()
+      
   return DummySubApp

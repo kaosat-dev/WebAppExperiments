@@ -1,13 +1,27 @@
 <script id="contentTmpl" type="text/x-underscore-template">
-	<div id="menu"> Test
-		<a href="#" class="listDummies">List dummies</a>
-		<a href="#" class="newDummy">New dummy</a>
-		<a href="#" class="deleteDummy">Delete dummy</a>
-		
-		<a href="#" class="saveDummies">Save dummies</a>
-		
-		
-		<a href="#" class="folderCreate">Create folder(dropbox)</a>
-		<a href="#" class="dropBoxLogin">Login to dropbox</a>
+	<div id="menu">
+		<div style="float: left">
+			<a href="#" class="fetchDummies">Fetch dummies</a>
+			<a href="#" class="listDummies">List dummies</a>
+			<a href="#" class="saveDummies">Save dummies</a>
+		</div>
+		<br />
+		##################################################################
+		<div >
+			<a href="#" class="findDummy">Find dummy</a>
+			<input type="text"  id="dummyFindInput"/>
+			<a href="#" class="newDummy">New dummy</a>
+			<input type="text"  id="dummyNameInput"/>
+			<a href="#" class="folderCreate">Create folder(dropbox)</a>
+			<input type="text"  id="folderNameInput"/>
+		</div>
+		<br />
+		##################################################################
+		<div>
+			<a href="#" class="dropBoxLogin">Login to dropbox</a>
+			<a href="#" class="dropBoxLogout">Logout of dropbox</a>
+		</div>
+		<br />
+		##################################################################
 	</div>
 </script>
