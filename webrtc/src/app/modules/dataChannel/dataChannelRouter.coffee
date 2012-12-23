@@ -5,16 +5,10 @@ define (require)->
   marionette = require 'marionette'
   vent = require '../core/vent'
   
-  class DummyRouter extends Backbone.Marionette.AppRouter
-    appRoutes: 
-        "dummy:list"  : 'listDummies'
-        "dummy:new"   : 'newDummy'
-        "dummy:delete": 'deleteDummy'
-        "dummy:save"  : 'saveDummy'
-        "dummy:find"  : 'findDummy'
-        "dummies:save": 'saveDummies'
-        "dummies:fetch":'fetchDummies'
-        
+  class DataChannelRouter extends Backbone.Marionette.AppRouter
+    #appRoutes: 
+        #"dummy:list"  : 'listDummies'
+       
     constructor:(options)->
       super options
       @setController(options.controller)
@@ -22,7 +16,6 @@ define (require)->
     setController:(controller)=>
       @controller = controller
       for route, methodName of @appRoutes
-        #console.log "Route: #{route} #{methodName}"
         vent.bind(route, @controller[methodName])
             
-  return DummyRouter
+  return DataChannelRouter

@@ -3,12 +3,12 @@ define (require)->
   _ = require 'underscore'
   Backbone = require 'backbone'
   marionette = require 'marionette'
-  StorageApp = require 'modules/storage.app'  
+  WebRTCApp = require 'modules/webrtc.app'  
   
   
   ###############################
  
-  app = new StorageApp()
+  app = new WebRTCApp()
   
   # Mix Backbone.Events, modules, and layout management into the app object.
   ###return _.extend app,

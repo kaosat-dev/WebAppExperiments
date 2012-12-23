@@ -1,0 +1,7 @@
+#Initialize caller peerConnection
+pc1 = new mozRTCPeerConnection()
+
+#OnDataChannel:
+
+#onconnection:once connection is established on pc1
+	

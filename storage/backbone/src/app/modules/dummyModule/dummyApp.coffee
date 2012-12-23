@@ -3,7 +3,7 @@ define (require)->
   _ = require 'underscore'
   Backbone = require 'backbone'
   marionette = require 'marionette'
-  vent = require '../coffeescad.vent'
+  vent = require '../core/vent'
   
   DummyCollectionView = require './dummyView'
   Dummy = require './dummy'

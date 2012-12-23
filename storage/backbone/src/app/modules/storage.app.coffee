@@ -3,7 +3,7 @@ define (require)->
   _ = require 'underscore'
   marionette = require 'marionette'
   
-  vent = require './coffeescad.vent'
+  vent = require './core/vent'
   contentTemplate = require "text!modules/content.tmpl"
   DummySubApp = require 'modules/dummyModule/dummyApp'
   
@@ -32,9 +32,9 @@ define (require)->
       super options
       
       
-  class CoffeeScadApp extends Backbone.Marionette.Application
+  class StorageApp extends Backbone.Marionette.Application
     root: "/WebAppExperiments/storage/backbone/index.html/"
-    title: "Coffeescad"
+    title: "StorageTest"
     regions:
       headerRegion: "#header"
       mainRegion: "#content"
@@ -97,6 +97,6 @@ define (require)->
       
       
 
-  return CoffeeScadApp   
+  return StorageApp   
 
 

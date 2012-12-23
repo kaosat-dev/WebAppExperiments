@@ -4,7 +4,7 @@ define (require)->
   boostrap = require 'bootstrap'
   marionette = require 'marionette'
   
-  vent = require '../coffeescad.vent'
+  vent = require '../core/vent'
   dummyTemplate = require "text!./dummy.tmpl"
   
   
